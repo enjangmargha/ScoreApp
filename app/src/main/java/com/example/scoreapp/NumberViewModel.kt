@@ -1,6 +1,8 @@
 package com.example.scoreapp
 
-class ScoreViewModel {
+import androidx.lifecycle.ViewModel
+
+class NumberViewModel : ViewModel() {
     var scoreTeamA: Int = 0
     var scoreTeamB: Int = 0
 
