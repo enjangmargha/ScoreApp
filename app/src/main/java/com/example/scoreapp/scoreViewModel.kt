@@ -12,11 +12,15 @@ class ScoreViewModel : ViewModel() {
     val scoreTeamB: LiveData<Int> get() = _scoreTeamB
 
     fun addScoreTeamA(points: Int) {
-        _scoreTeamA.value = (_scoreTeamA.value ?: 0) + points
+        if ((_scoreTeamA.value ?: 0) < 25 && (_scoreTeamB.value ?: 0) < 25) {
+            _scoreTeamA.value = (_scoreTeamA.value ?: 0) + points
+        }
     }
 
     fun addScoreTeamB(points: Int) {
-        _scoreTeamB.value = (_scoreTeamB.value ?: 0) + points
+        if ((_scoreTeamA.value ?: 0) < 25 && (_scoreTeamB.value ?: 0) < 25) {
+            _scoreTeamB.value = (_scoreTeamB.value ?: 0) + points
+        }
     }
 
     fun resetScores() {
