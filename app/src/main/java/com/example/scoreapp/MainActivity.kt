@@ -1,81 +1,44 @@
 package com.example.scoreapp
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import com.example.scoreapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    private val scoreViewModel: NumberViewModel by viewModels()
-
-    private lateinit var tvScoreA: TextView
-    private lateinit var tvScoreB: TextView
-    private lateinit var btnPlus1A: Button
-    private lateinit var btnPlus2A: Button
-    private lateinit var btnPlus1B: Button
-    private lateinit var btnPlus2B: Button
-    private lateinit var btnReset: Button
+    private val scoreViewModel: ScoreViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.lifecycleOwner = this
+        binding.scoreViewModel = scoreViewModel
 
-        // Inisialisasi UI
-        tvScoreA = findViewById(R.id.tv_score_a)
-        tvScoreB = findViewById(R.id.tv_score_b)
-        btnPlus1A = findViewById(R.id.btn_plus1_a)
-        btnPlus2A = findViewById(R.id.btn_plus2_a)
-        btnPlus1B = findViewById(R.id.btn_plus1_b)
-        btnPlus2B = findViewById(R.id.btn_plus2_b)
-        btnReset = findViewById(R.id.btn_reset)
+        // Menggunakan LiveData untuk update UI otomatis
+        scoreViewModel.scoreTeamA.observe(this, Observer { score ->
+            binding.tvScoreA.text = score.toString()
+        })
 
-        // Menampilkan skor terakhir saat Activity dibuat ulang
-        updateScores()
+        scoreViewModel.scoreTeamB.observe(this, Observer { score ->
+            binding.tvScoreB.text = score.toString()
+        })
 
-        // Event Listener untuk tombol Team A
-        btnPlus1A.setOnClickListener {
-            scoreViewModel.scoreTeamA += 1
-            updateScores()
-        }
+        // Event klik tombol menggunakan binding
+        binding.btnPlus1A.setOnClickListener { scoreViewModel.addScoreTeamA(1) }
+        binding.btnPlus2A.setOnClickListener { scoreViewModel.addScoreTeamA(2) }
+        binding.btnPlus1B.setOnClickListener { scoreViewModel.addScoreTeamB(1) }
+        binding.btnPlus2B.setOnClickListener { scoreViewModel.addScoreTeamB(2) }
+        binding.btnReset.setOnClickListener { scoreViewModel.resetScores() }
 
-        btnPlus2A.setOnClickListener {
-            scoreViewModel.scoreTeamA += 2
-            updateScores()
-        }
-
-        // Event Listener untuk tombol Team B
-        btnPlus1B.setOnClickListener {
-            scoreViewModel.scoreTeamB += 1
-            updateScores()
-        }
-
-        btnPlus2B.setOnClickListener {
-            scoreViewModel.scoreTeamB += 2
-            updateScores()
-        }
-
-        // Tombol Reset
-        btnReset.setOnClickListener {
-            scoreViewModel.scoreTeamA = 0
-            scoreViewModel.scoreTeamB = 0
-            updateScores()
-        }
-
-        // Mengatur padding sesuai dengan insets sistem (opsional)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-    }
-
-    // Fungsi untuk memperbarui tampilan skor
-    private fun updateScores() {
-        tvScoreA.text = scoreViewModel.scoreTeamA.toString()
-        tvScoreB.text = scoreViewModel.scoreTeamB.toString()
     }
 }
